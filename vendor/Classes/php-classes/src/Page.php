@@ -12,7 +12,7 @@ Class Page{
 		"data" => []
 	];
 	
-	public function __construct($opts = array()){ 
+	public function __construct($opts = array(), $tpl_dir = "/views/"){ 
 		//As variaveis vão vir de acordo com as rotas. 
 		//Dependendo da rota, será enviado dados para a classe tpl.
 		
@@ -21,7 +21,7 @@ Class Page{
 		//sobrescrever os anteriores.
 		
 		$config = array(
-			"tpl_dir"   => $_SERVER["DOCUMENT_ROOT"]."/views/",
+			"tpl_dir"   => $_SERVER["DOCUMENT_ROOT"].$tpl_dir,
 			"cache_dir" => $_SERVER["DOCUMENT_ROOT"]."/views-cache/",
 			"debug"     => false
 		);
