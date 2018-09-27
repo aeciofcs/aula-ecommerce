@@ -2,17 +2,17 @@
 
 require_once("vendor/autoload.php");
 
-$app = new \Slim\Slim();
+use \Slim\Slim;
+use \Classes\Page;
+
+$app = new Slim();
 
 $app->config('debug', true);
 
 $app->get('/', function() {
-    	
-	$sql = new Classes\DB\Sql();
-	$results = $sql->select("Select * From tb_users");
-	
-	echo json_encode($results);
-	
+	//Quando instancia a classe page, já renderiza o arquivo header.html
+	$page = new Page(); 
+	$page->setTpl("index");
 });
 
 $app->run();
