@@ -22,8 +22,7 @@ class Sql {
 
 	}
 
-	private function setParams($statement, $parameters = array())
-	{
+	private function setParams($statement, $parameters = array()){
 
 		foreach ($parameters as $key => $value) {
 			
@@ -33,11 +32,8 @@ class Sql {
 
 	}
 
-	private function bindParam($statement, $key, $value)
-	{
-
+	private function bindParam($statement, $key, $value){
 		$statement->bindParam($key, $value);
-
 	}
 
 	public function query($rawQuery, $params = array())
