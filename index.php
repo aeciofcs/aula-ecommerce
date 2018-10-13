@@ -242,6 +242,21 @@ $app->post("/admin/categories/:idcategory", function($idcategory){
 	exit;
 });
 
+$app->get("/categories/:idcategory", function($idcategory){
+	
+	//Informando categorias no rodapé do site.
+	User::verifyLogin();
+	$category = new Category();
+	$category->get((int)$idcategory);
+	
+	$page = new Page();	
+	$page->setTpl("category", array(
+			"category" => $category->getValues(),
+			"products" => [] ));
+	
+});
+
+
 
 $app->run();
 
