@@ -267,7 +267,7 @@ desired effect
           <ul class="treeview-menu">
             <li><a href="/admin/users">Usuários</a></li>
 			<li><a href="/admin/categories">Categorias</a></li>
-            <li><a href="#">Link in level 2</a></li>
+            <li><a href="/admin/products">Produtos</a></li>
           </ul>
         </li>		
         <li><a href="#"><i class="fa fa-link"></i> <span>Another Link</span></a></li>
