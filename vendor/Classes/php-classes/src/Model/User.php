@@ -122,6 +122,7 @@ class User extends Model{
 				//$code = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, User::SECRET, $dataRecovery["idrecovery"], MCRYPT_MODE_ECB));
 				$code = openssl_encrypt($dataRecovery["idrecovery"], "aes-256-cbc", User::SECRET, 0, $iv);
 				$result = base64_encode($iv.$code);
+				
 				$link = "http://www.lojavirtual.com.br/admin/forgot/reset?code=$result";
 				$mailer = new Mailer($data["desemail"], 
 									 $data["desperson"],
@@ -137,12 +138,16 @@ class User extends Model{
 	}
 	
 	public static function validForgotDecrypt($code){
-		
-		$result = base64_decode($code); //base64_decode($result);
-        $code = mb_substr($result, openssl_cipher_iv_length('aes-256-cbc'), null, '8bit');
-        $iv = mb_substr($result, 0, openssl_cipher_iv_length('aes-256-cbc'), '8bit');;
-        $idrecovery = openssl_decrypt($code, 'aes-256-cbc', User::SECRET, 0, $iv);
 				
+		$result = base64_decode($code); 
+	    $code = mb_substr($result, openssl_cipher_iv_length('aes-256-cbc'), null, '8bit');        
+		$iv = mb_substr($result, 0, openssl_cipher_iv_length('aes-256-cbc'), '8bit');        
+		$idrecovery = openssl_decrypt($code, 'aes-256-cbc', User::SECRET, 0, $iv);		
+        
+		$teste = base64_decode("inPDv0qdasDMSBCL7f83XZqOGY0dUJsSjcrU2pFcTQzZHVuUUE9PQ==");
+		//var_dump($idrecovery);
+		//var_dump($code, $iv);
+		//exit;
 		$sql = new Sql();
 		$results = $sql->select("Select * From tb_userspasswordsrecoveries a
                                  INNER JOIN tb_users b USING(iduser)

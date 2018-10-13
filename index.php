@@ -147,6 +147,9 @@ $app->get('/admin/forgot/sent', function(){
 
 $app->get('/admin/forgot/reset', function(){
 	
+	//var_dump($_GET["code"]);
+	//exit;
+	
 	$user = User::validForgotDecrypt($_GET["code"]);
 	
 	$page = new PageAdmin([
