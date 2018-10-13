@@ -232,7 +232,7 @@ $app->get("/admin/categories/:idcategory", function($idcategory){
 });
 
 $app->post("/admin/categories/:idcategory", function($idcategory){
-	//Gravando alterações de edição nas Categorias
+	//Gravando alterações de edição nas Categorias ->>
 	User::verifyLogin();
 	$category = new Category();
 	$category->get((int)$idcategory);
