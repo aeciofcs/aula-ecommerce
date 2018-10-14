@@ -13,6 +13,19 @@ class Product extends Model{
 		return $sql->select("SELECT * FROM tb_products
 					         ORDER BY desproduct");
 	}
+	
+	public static function checkList($list){
+		foreach($list as &$row){
+			$prod = new Product();
+			$prod->setData($row);
+			$row = $prod->getValues();
+		}
+		return $list;
+	}
+	
+	public static function formatPrice(){
+		
+	}
 
 	public function save(){
 		$sql = new Sql();
