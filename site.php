@@ -23,7 +23,7 @@ $app->get("/categories/:idcategory", function($idcategory){
 	$pagination = $category->getProductsPage($page);
 	
 	$pages = [];
-	for ($i=1; $i <= $pagination['pages']; $i++){
+	for ($i = 1; $i <= $pagination['pages']; $i++){
 		array_push($pages, [
 			'link' => '/categories/' . $category->getidcategory().'?page=' . $i,
 			'page' => $i
