@@ -38,4 +38,17 @@ $app->get("/categories/:idcategory", function($idcategory){
 	
 });
 
+$app->get("/products/:desurl", function($desurl) {
+	
+	//Rota para detalhes do produto
+	$product = new Product();
+	
+	$product->getFromURL($desurl);
+	
+	$page = new Page(); 
+	$page->setTpl("product-detail", [
+		'product'    => $product->getValues(),
+		'categories' => $product->getCategories() ]);
+});
+
 ?>
