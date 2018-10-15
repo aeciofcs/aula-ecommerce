@@ -220,7 +220,7 @@ class User extends Model{
 		$_SESSION[User::ERROR] = NULL;
 	}
 	
-	public static getPasswordHash($password){
+	public static function getPasswordHash($password){
 		return password_hash($password, PASSWORD_DEFAULT, [ 'cost' => 12 ] );
 	}
 }
