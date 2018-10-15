@@ -51,8 +51,7 @@ $app->post('/admin/users/create', function() {
 	User::verifyLogin();
 	
 	$user = new User();
-	$_POST["inadmin"] = (isset($_POST["inadmin"]))? 1 : 0;
-	$_POST["despassword"] = password_hash($_POST["despassword"], PASSWORD_BCRYPT, ["cost" => 12]);
+	$_POST["inadmin"] = (isset($_POST["inadmin"]))? 1 : 0;	
 	$user->setData($_POST);	
 	$user->save($user);
 	
@@ -64,8 +63,7 @@ $app->post('/admin/users/create', function() {
 $app->post('/admin/users/:iduser', function($iduser) {	
 	User::verifyLogin();
 	$user = new User();
-	$_POST["inadmin"] = (isset($_POST["inadmin"]))? 1 : 0;
-	//$_POST["despassword"] = password_hash($password, PASSWORD_DEFAULT);
+	$_POST["inadmin"] = (isset($_POST["inadmin"]))? 1 : 0;	
 	$user->get((int)$iduser); //carrega e coloca nos values;
 	$user->setData($_POST); //alteração do que foi alterado via POST;
 	$user->update();

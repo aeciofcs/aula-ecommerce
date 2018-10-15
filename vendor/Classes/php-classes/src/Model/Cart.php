@@ -11,14 +11,14 @@ class Cart extends Model{
 	
 	public static function getFromSession(){
 		//verifica se precisa inserir um carrinho novo, se ja tem esse carrinho, 
-		$cart = new Cart();
+		$cart = new Cart();		
 		
 		//esse carrinho ja está na sessão?? 
 		//   vê se a sessão foi definida e se o carrinho está na sessão!
 		if ( isset($_SESSION[Cart::SESSION]) && (int)$_SESSION[Cart::SESSION]['idcart'] > 0 ){
-			//se entrar aqui é pq existe uma sessão definida e o carrinho está na sessão e já foi inserido no banco.
-			$cart->get((int)$_SESSION[Cart::SESSION]['idcart']);//carrega o id do carrinho no objeto carrinho;
-		}else{
+			//se entrar aqui é pq existe uma sessão definida e o carrinho está na sessão e já foi inserido no banco.			
+			$cart->get((int)$_SESSION[Cart::SESSION]['idcart']);//carrega o id do carrinho no objeto carrinho;			
+		}else{			
 			$cart->getFromSessionID();
 			if ( !(int)$cart->getidcart() > 0 ){
 				$data = [
@@ -32,7 +32,7 @@ class Cart extends Model{
 				$cart->save();
 				$cart->setToSession();				
 			}
-		}
+		}		
 		return $cart;
 	}
 	
@@ -119,9 +119,17 @@ class Cart extends Model{
 	
 	public function getProductsTotals(){
 		$sql = new Sql();
-		$results = $sql->select("SELECT SUM(prod.vlprice)  AS vlprice,  SUM(prod.vlwidth)  AS vlwidth,
-								        SUM(prod.vlheight) AS vlheight, SUM(prod.vllength) AS vllength,
-										SUM(prod.vlweight) AS vlweight, COUNT(*) AS nrqtd
+		$results = $sql->select("SELECT Case When Prod.vlprice Is Null Then 0 
+											 Else SUM(prod.vlprice) End vlprice,  
+									    Case When prod.vlwidth Is Null Then 0 
+										     Else SUM(prod.vlwidth) End vlwidth,
+									    Case When prod.vlheight Is Null Then 0 
+									  		 Else SUM(prod.vlheight) End vlheight, 
+									    Case When prod.vllength Is Null Then 0 
+											 Else SUM(prod.vllength) End vllength,
+									    Case When prod.vlweight Is Null Then 0 
+											 Else SUM(prod.vlweight) End vlweight, 
+									    COUNT(*) AS nrqtd										
 								 FROM tb_products prod 
 								 INNER JOIN tb_cartsproducts cart_prod USING(idproduct)
 								 WHERE cart_prod.idcart = :idcart AND dtremoved IS NULL;", [
@@ -157,6 +165,8 @@ class Cart extends Model{
 			$xml = simplexml_load_file("http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx/CalcPrecoPrazo?".$qs);
 			$result = $xml->Servicos->cServico;	
 			
+			var_dump($nrzipcode);
+			exit;
 			if ($result->MsgErro != ''){
 				Cart::setMsgError($result->MsgErro);				
 			}else{
@@ -195,8 +205,7 @@ class Cart extends Model{
 	
 	public function updateFreight(){
 		if($this->getdeszipcode() != ''){
-			$this->setFreight($this->getdeszipcode());
-			
+			$this->setFreight($this->getdeszipcode());			
 		}
 	}
 	
@@ -205,13 +214,12 @@ class Cart extends Model{
 		return parent::getValues();
 	}
 	
-	public function getCalculateTotal(){
-		
+	public function getCalculateTotal(){		
 		$this->updateFreight();
 		$totals = $this->getProductsTotals();
 		
 		$this->setvlsubtotal($totals['vlprice']);
-		$this->setvltotal($totals['vlprice'] + $this->getvlfreight());		
+		$this->setvltotal($totals['vlprice'] + $this->getvlfreight());
 	}
 	
 }
