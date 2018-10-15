@@ -3,6 +3,7 @@
 use \Classes\Page;
 use \Classes\Model\Product;
 use \Classes\Model\Category;
+use \Classes\Model\Cart;
 
 $app->get('/', function() {
 	//Quando instancia a classe page, já renderiza o arquivo header.html
@@ -49,6 +50,15 @@ $app->get("/products/:desurl", function($desurl) {
 	$page->setTpl("product-detail", [
 		'product'    => $product->getValues(),
 		'categories' => $product->getCategories() ]);
+});
+
+$app->get("/cart", function() {
+	
+	$cart = Cart::getFromSession();
+	
+		
+	$page = new Page(); 
+	$page->setTpl("cart");
 });
 
 ?>
