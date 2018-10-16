@@ -17,9 +17,7 @@ class Cart extends Model{
 		//   vê se a sessão foi definida e se o carrinho está na sessão!
 		if ( isset($_SESSION[Cart::SESSION]) && (int)$_SESSION[Cart::SESSION]['idcart'] > 0 ){
 			//se entrar aqui é pq existe uma sessão definida e o carrinho está na sessão e já foi inserido no banco.				
-			$cart->get((int)$_SESSION[Cart::SESSION]['idcart']);//carrega o id do carrinho no objeto carrinho;
-			//var_dump($cart);
-	        //exit;			
+			$cart->get((int)$_SESSION[Cart::SESSION]['idcart']);//carrega o id do carrinho no objeto carrinho;						
 		}else{			
 			$cart->getFromSessionID();
 			if ( !(int)$cart->getidcart() > 0 ){
@@ -29,9 +27,7 @@ class Cart extends Model{
 				if ( User::checkLogin(false) ){
 					$user = User::getFromSession();
 					$data['iduser'] = $user->getiduser();
-				}
-                var_dump($cart);
-	            exit;				
+				}                				
 				$cart->setData($data);
 				$cart->save();
 				$cart->setToSession();				
