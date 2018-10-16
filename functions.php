@@ -1,9 +1,10 @@
 <?php 
 
 use \Classes\Model\User;
+use \Classes\Model\Cart;
 
-function formatPrice(float $vlprice){
-	return number_format($vlprice,2,",",".");		
+function formatPrice(float $vlprice){	
+	return number_format($vlprice,2,",",".");
 }
 
 function checkLogin($inadmin = true){
@@ -11,11 +12,8 @@ function checkLogin($inadmin = true){
 }
 
 function getUserName(){
-	$user = User::getFromSession();
-	//ar_dump($user);
-	//exit;
+	$user = User::getFromSession();	
 	return $user->getdesperson();
 }
-
 
 ?>

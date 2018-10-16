@@ -11,13 +11,15 @@ class Cart extends Model{
 	
 	public static function getFromSession(){
 		//verifica se precisa inserir um carrinho novo, se ja tem esse carrinho, 
-		$cart = new Cart();		
+		$cart = new Cart();
 		
 		//esse carrinho ja está na sessão?? 
 		//   vê se a sessão foi definida e se o carrinho está na sessão!
 		if ( isset($_SESSION[Cart::SESSION]) && (int)$_SESSION[Cart::SESSION]['idcart'] > 0 ){
-			//se entrar aqui é pq existe uma sessão definida e o carrinho está na sessão e já foi inserido no banco.			
-			$cart->get((int)$_SESSION[Cart::SESSION]['idcart']);//carrega o id do carrinho no objeto carrinho;			
+			//se entrar aqui é pq existe uma sessão definida e o carrinho está na sessão e já foi inserido no banco.				
+			$cart->get((int)$_SESSION[Cart::SESSION]['idcart']);//carrega o id do carrinho no objeto carrinho;
+			//var_dump($cart);
+	        //exit;			
 		}else{			
 			$cart->getFromSessionID();
 			if ( !(int)$cart->getidcart() > 0 ){
@@ -27,18 +29,24 @@ class Cart extends Model{
 				if ( User::checkLogin(false) ){
 					$user = User::getFromSession();
 					$data['iduser'] = $user->getiduser();
-				}				
+				}
+                var_dump($cart);
+	            exit;				
 				$cart->setData($data);
 				$cart->save();
 				$cart->setToSession();				
 			}
-		}		
+		}        		
 		return $cart;
 	}
 	
 	public function setToSession(){
 		$_SESSION[Cart::SESSION] = $this->getValues();
 	}
+	
+	public static function removeToSession(){
+		$_SESSION[Cart::SESSION] = NULL;		
+	}	
 	
 	public function getFromSessionID(){
 		$sql = new Sql();		
@@ -165,8 +173,6 @@ class Cart extends Model{
 			$xml = simplexml_load_file("http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx/CalcPrecoPrazo?".$qs);
 			$result = $xml->Servicos->cServico;	
 			
-			var_dump($nrzipcode);
-			exit;
 			if ($result->MsgErro != ''){
 				Cart::setMsgError($result->MsgErro);				
 			}else{
@@ -204,6 +210,13 @@ class Cart extends Model{
 	}
 	
 	public function updateFreight(){
+		if(is_null($this->getvlfreight())){
+			$this->setvlfreight(0);
+		}
+		if(is_null($this->getnrdays())){
+			$this->setnrdays(0);
+		}
+		
 		if($this->getdeszipcode() != ''){
 			$this->setFreight($this->getdeszipcode());			
 		}
@@ -220,6 +233,13 @@ class Cart extends Model{
 		
 		$this->setvlsubtotal($totals['vlprice']);
 		$this->setvltotal($totals['vlprice'] + $this->getvlfreight());
+	}
+	
+	public function checkZipCode(){
+		$products = $this->getProducts();
+		if(!Count($products) > 0){
+			$this->setdeszipcode('');
+		}
 	}
 	
 }
