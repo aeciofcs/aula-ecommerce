@@ -48,7 +48,8 @@ class User extends Model{
 		}
 		
 		$data = $results[0];
-		
+		//var_dump($password);
+		//exit;
 		if ( password_verify($password, $data["despassword"]) === true ){
 			
 			$user = new User();
@@ -59,7 +60,7 @@ class User extends Model{
 			return $user;
 			
 		}else{
-			throw new \Exception("Usuário inexistente ou senha inválida.");
+			throw new \Exception("Usuário inexistente ou senha inválida. PASSWORD INVÁLIDO");
 		}
 	}
 	
@@ -129,7 +130,7 @@ class User extends Model{
 					":iduser" => $this->getiduser() ));
 	}
 	
-	public static function getForgot($email){
+	public static function getForgot($email, $inadmin = true){
 		$sql = new Sql();
 		$results = $sql->select("SELECT * FROM tb_persons per 
 		                         INNER JOIN tb_users us USING(idperson)
@@ -151,7 +152,12 @@ class User extends Model{
 				$code = openssl_encrypt($dataRecovery["idrecovery"], "aes-256-cbc", User::SECRET, 0, $iv);
 				$result = base64_encode($iv.$code);
 				
-				$link = "http://www.lojavirtual.com.br/admin/forgot/reset?code=$result";
+				if($inadmin){
+					$link = "http://www.lojavirtual.com.br/admin/forgot/reset?code=$result";
+				}else{
+					$link = "http://www.lojavirtual.com.br/forgot/reset?code=$result";
+				}
+				
 				$mailer = new Mailer($data["desemail"], 
 									 $data["desperson"],
 									 "Redefinir Senha da Loja Virtual",
@@ -203,7 +209,7 @@ class User extends Model{
 		$sql->query("UPDATE tb_users 
 		             SET despassword = :password
 					 WHERE iduser = :iduser", array(
-						  "password" => $password,
+						  "password" => User::getPasswordHash($password),
 						  "iduser"   => $this->getiduser() ));
 	}
 	
@@ -245,5 +251,11 @@ class User extends Model{
 								':deslogin' => $login]);
 		return ( Count($results) > 0 );
 	}
+	
+	public static function removeToSession(){
+		$_SESSION[Cart::SESSION] = NULL;		
+	}
+	
+	
 }
 ?>
