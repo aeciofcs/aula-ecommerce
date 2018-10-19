@@ -8,8 +8,7 @@ $app->get('/admin', function() {
 	
 	//Quando instancia a classe PageAdmin, já renderiza o arquivo header.html
 	$page = new PageAdmin(); 
-	$page->setTpl("index");
-	
+	$page->setTpl("index");	
 });
 
 $app->get('/admin/login', function() {	
@@ -78,14 +77,13 @@ $app->post('/admin/forgot/reset', function(){
 	$forgot = User::validForgotDecrypt($_POST["code"]);
 	User::setForgotUsed($forgot["idrecovery"]);
 	$user = new User();
-	$user->get((int)$forgot["iduser"]);													
-	$user->setPassword($_POST["password"]);	
+	$user->get((int)$forgot["iduser"]);
+	$user->setPassword($_POST["password"]);
 	$page = new PageAdmin([
 		"header" => false,
 		"footer" => false
-	]); 
-	$page->setTpl("forgot-reset-success");	
-	
+	]);
+	$page->setTpl("forgot-reset-success");
 });
 
 

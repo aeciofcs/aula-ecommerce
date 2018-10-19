@@ -11,6 +11,8 @@ class User extends Model{
 	const SECRET         = "LojaVirtual_AFCS";
 	const ERROR          = "UserError";
 	const ERROR_REGISTER = "UserErrorRegister";
+	const SUCCESS        = "UserSuccess";
+	
 	
 	public static function checkLogin($inadmin = true){
 		if ( !isset($_SESSION[User::SESSION]) || 
@@ -48,8 +50,7 @@ class User extends Model{
 		}
 		
 		$data = $results[0];
-		//var_dump($password);
-		//exit;
+		
 		if ( password_verify($password, $data["despassword"]) === true ){
 			
 			$user = new User();
@@ -60,10 +61,14 @@ class User extends Model{
 			return $user;
 			
 		}else{
+			//var_dump(User::getPasswordHash($password), $data['despassword']);
+			//var_dump(password_verify($password, $data["despassword"]));
+			//exit;
 			throw new \Exception("Usuário inexistente ou senha inválida. PASSWORD INVÁLIDO");
 		}
 	}
 	
+	//
 	public static function verifyLogin($inadmin = true){
 		if( !User::checkLogin($inadmin) ){
 			if($inadmin){
@@ -75,17 +80,20 @@ class User extends Model{
 		}
 	}
 	
+	//
 	public static function logout(){
 		$_SESSION[User::SESSION] = null;
 	}
 	
+	//
 	public static function listAll(){
 		$sql = new Sql();
 		return $sql->select("SELECT * FROM tb_users us 
 		                     INNER JOIN tb_persons pe USING(idperson) 
 					         ORDER BY pe.desperson");
 	}
-		
+
+	//
 	public function save(){
 		$sql     = new Sql();
 		$results = $sql->select( "CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, 
@@ -99,6 +107,7 @@ class User extends Model{
 		$this->setData($results[0]);
 	}
 
+	//
 	public function get($iduser){
 		$sql     = new Sql();
 		$results = $sql->select("SELECT * FROM tb_users a 
@@ -110,26 +119,36 @@ class User extends Model{
 		$this->setData($results[0]);						
 	}
 	
-	public function update(){
+	//
+	public function update($fromAdmin = true){
 		$sql     = new Sql();
+		
+		if ( $fromAdmin ) {
+			$passwordSiteOrAdmin = User::getPasswordHash($this->getdespassword());
+		}else{
+			$passwordSiteOrAdmin = $this->getdespassword();			
+		}
+
 		$results = $sql->select( "CALL sp_usersupdate_save(:iduser, :desperson, :deslogin, :despassword, :desemail, 
 		                                                   :nrphone, :inadmin)", 
 								             		        Array( ":iduser"      => $this->getiduser(),
 															       ":desperson"   => utf8_decode($this->getdesperson()),
 										                           ":deslogin"    => $this->getdeslogin(),
-												                   ":despassword" => User::getPasswordHash($this->getdespassword()),
+												                   ":despassword" => $passwordSiteOrAdmin,
 												                   ":desemail"    => $this->getdesemail(),
 												                   ":nrphone"     => $this->getnrphone(),
 												                   ":inadmin"     => $this->getinadmin() ));
 		$this->setData($results[0]);		
 	}
 	
+	//
 	public function delete(){
 		$sql = new Sql();
 		$sql->query("CALL sp_users_delete(:iduser)", array( 
 					":iduser" => $this->getiduser() ));
 	}
 	
+	//
 	public static function getForgot($email, $inadmin = true){
 		$sql = new Sql();
 		$results = $sql->select("SELECT * FROM tb_persons per 
@@ -171,6 +190,7 @@ class User extends Model{
 		}		
 	}
 	
+	//
 	public static function validForgotDecrypt($code){
 				
 		$result = base64_decode($code); 
@@ -178,7 +198,7 @@ class User extends Model{
 		$iv = mb_substr($result, 0, openssl_cipher_iv_length('aes-256-cbc'), '8bit');        
 		$idrecovery = openssl_decrypt($code, 'aes-256-cbc', User::SECRET, 0, $iv);		
         
-		$teste = base64_decode("inPDv0qdasDMSBCL7f83XZqOGY0dUJsSjcrU2pFcTQzZHVuUUE9PQ==");
+		//$teste = base64_decode("inPDv0qdasDMSBCL7f83XZqOGY0dUJsSjcrU2pFcTQzZHVuUUE9PQ==");
 		//var_dump($idrecovery);
 		//var_dump($code, $iv);
 		//exit;
@@ -196,6 +216,7 @@ class User extends Model{
 		}
 	}
 	
+	//
 	public static function setForgotUsed($idrecovery){
 		$sql = new Sql();
 		$sql->query("UPDATE tb_userspasswordsrecoveries 
@@ -204,6 +225,7 @@ class User extends Model{
 						"idrecovery" => $idrecovery) );
 	}
 	
+	//
 	public function setPassword($password){
 		$sql = new Sql();
 		$sql->query("UPDATE tb_users 
@@ -213,6 +235,7 @@ class User extends Model{
 						  "iduser"   => $this->getiduser() ));
 	}
 	
+	//
 	public static function setError($msg){
 		$_SESSION[User::ERROR] = $msg; 
 	}
@@ -252,10 +275,18 @@ class User extends Model{
 		return ( Count($results) > 0 );
 	}
 	
-	public static function removeToSession(){
-		$_SESSION[Cart::SESSION] = NULL;		
+	public static function setSuccess($msg){
+		$_SESSION[User::SUCCESS] = $msg; 
 	}
 	
+	public static function getSuccess(){
+		$msg = (isset($_SESSION[User::SUCCESS]) && $_SESSION[User::SUCCESS]) ? $_SESSION[User::SUCCESS] : "";
+		User::clearSuccess();
+		return $msg;
+	}
 	
+	public static function clearSuccess(){
+		$_SESSION[User::SUCCESS] = NULL;
+	}	
 }
 ?>

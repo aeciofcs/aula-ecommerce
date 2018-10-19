@@ -237,6 +237,8 @@ class Cart extends Model{
 			$this->setdeszipcode('');
 		}
 	}
+
+	
 	
 }
 ?>
